@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="left_side">
+            <div class="content">
+
+                <div class="logo">
+                    <img src="images/AnchorzUp Logo_No Tagline.svg" alt="Logo">
+                </div>
+
+                <div class="short_url">
+                    <p style="font-size: 20px;">My shortened URLs</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="right_side">
+            <div class="content123">
+                <h2>URL Shortener</h2>
+                <!-- Forma per te futur URL-n dhe datat e skadimit -->
+                <form id="urlForm">
+                    <div class="url_bar">
+                        <input type="text" id="long_url" placeholder="Place the URL to be shortened">
+                        <select id="expiration-select">
+                            <option value="" disabled selected>Add Expiration Date</option>
+                            <option value="1">1 Minute</option>
+                            <option value="5">5 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                            <option value="60">1 Hour</option>
+                            <option value="300">5 Hours</option>
+                        </select>
+                    </div>
+                    <button type="button" id="shortenBtn" class="button_short">Shorten URL</button>
+                </form>
+
+                <div id="shortUrlDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ngarkimi i URL-ve te shkurtesuara kur faqja hapet
+        document.addEventListener("DOMContentLoaded", fetchShortenedUrls);
+
+        // Merr te gjitha URL-t e shkurtesuara nga serveri
+        function fetchShortenedUrls() {
+            fetch("/get-shortened-urls")
+                .then(response => response.json())
+                .then(urls => {
+                    const shortUrlList = document.querySelector(".short_url");
+                    shortUrlList.innerHTML = "<p>My shortened URLs</p>";
+                    urls.forEach(url => {
+                        const linkElement = createLinkElement({
+                            short_code: url.short_code,
+                            short_url: `http://localhost:5000/${url.short_code}`,
+                            click_count: url.click_count || 0
+                        });
+                        shortUrlList.appendChild(linkElement);
+                    });
+                })
+                .catch(error => console.error("Error fetching URLs:", error));
+        }
+
+        // Krijon elementin per URL e shkurtesuar
+        function createLinkElement(url) {
+    const linkElement = document.createElement("p");
+    linkElement.innerHTML = `
+        <a href="${url.short_url}" target="_blank">${url.short_url}</a>
+        <br> <span class="click-text">This link has been clicked: ${url.click_count} times</span>
+    `;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.innerHTML = '<img src="images/bin-icon.svg" alt="Delete">';
+    deleteBtn.addEventListener("click", () => deleteShortUrl(url.short_code, linkElement));
+
+    linkElement.appendChild(deleteBtn);
+    return linkElement;
+}
+
+
+        // Fshin nje URL te shkurtesuar
+        function deleteShortUrl(shortCode, linkElement) {
+            fetch(`/delete-short-url/${shortCode}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        linkElement.remove();
+                    } else {
+                        alert("Failed to delete the URL");
+                    }
+                })
+                .catch(error => console.error("Error deleting URL:", error));
+        }
+
+        // Gjeneron nje URL te shkurtesuar kur perdoruesi klikon butonin
+        document.getElementById("shortenBtn").addEventListener("click", () => {
+            const longUrl = document.getElementById("long_url").value;
+            const expiration = document.getElementById("expiration-select").value;
+
+            if (!longUrl) {
+                alert("Please enter a URL!");
+                return;
+            }
+
+            fetch("/shorten", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ long_url: longUrl, expiration_select: expiration })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.short_url) {
+                        const shortUrlList = document.querySelector(".short_url");
+                        const newLinkElement = createLinkElement({
+                            short_code: data.short_url.split("/").pop(),
+                            short_url: data.short_url,
+                            click_count: 0
+                        });
+                        shortUrlList.appendChild(newLinkElement);
+
+                        document.getElementById("long_url").value = "";
+                        document.getElementById("expiration-select").selectedIndex = 0;
+                    } else if (data.error) {
+                        alert("Error: " + data.error);
+                    }
+                });
+        });
+    </script>
+</body>
+
+</html>

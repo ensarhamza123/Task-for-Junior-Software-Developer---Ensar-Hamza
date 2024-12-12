@@ -1,0 +1,99 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.left_side {
+    width: 30%;
+    background-color: lightgrey;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    margin: 0 auto;
+    margin-top: 40px;
+}
+
+.short_url p {
+    font-weight: bold;
+    font-size: 22px;
+    margin-top: 50px;
+}
+
+.right_side {
+    width: 70%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content123 {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 80%;
+}
+
+#long_url {
+    width: 35%;
+    padding: 5px 10px;
+    height: 4vh;
+}
+
+#expiration-select {
+    width: 25%;
+    padding: 5px 10px;
+    height: 5.7vh; 
+}
+
+.button_short {
+    padding: 10px 25px;
+    background-color: purple;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button_short:hover {
+    background-color: darkviolet;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.delete-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+a {
+    text-decoration: none;
+    color: blue;
+    font-size: 16px;
+}
+
+.click-text {
+    color: #9bb7f4; 
+    font-weight: bold; 
+    font-size: 14px; 
+}
+
+
+
+
